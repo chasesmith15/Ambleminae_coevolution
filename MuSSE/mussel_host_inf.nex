@@ -1,0 +1,110 @@
+#NEXUS
+
+Begin data;
+Dimensions ntax=99 nchar=1;
+Format datatype=Standard symbols="1234567" missing=? gap=-;
+Matrix
+Amblema_plicata	1
+Cambarunio_taeniatus	2
+Cyclonaias_kieneriana	3
+Cyclonaias_necki	3
+Cyclonaias_nodulata	3
+Cyclonaias_pustulosa	3
+Cyclonaias_succissa	3
+Cyclonaias_tuberculata	3
+Cyprogenia_aberti	4
+Cyprogenia_stegaria	4
+Dromus_dromas	4
+Ellipsaria_lineolata	5
+Elliptio_arca	1
+Elliptio_chipolaensis	1
+Elliptio_complanata	1
+Elliptio_crassidens	1
+Elliptio_shepardiana	1
+Epioblasma_brevidens	6
+Epioblasma_capsaeformis	6
+Epioblasma_torulosa	6
+Epioblasma_triquetra	6
+Eurynia_dilatata	1
+Fusconaia_escambia	7
+Fusconaia_flava	7
+Fusconaia_masoni	7
+Fusconaia_mitchelli	7
+Hamiota_perovalis	2
+Hamiota_subangulata	2
+Lampsilis_bracteata	2
+Lampsilis_cardium	2
+Lampsilis_dolabraeformis	2
+Lampsilis_fasciola	2
+Lampsilis_floridensis	2
+Lampsilis_higginsii	2
+Lampsilis_hydiana	2
+Lampsilis_ornata	2
+Lampsilis_satura	2
+Lampsilis_siliquoidea	2
+Lampsilis_splendida	2
+Lampsilis_straminea	2
+Lampsilis_teres	2
+Leaunio_vanuxemensis	6
+Lemiox_rimosus	6
+Ligumia_recta	2
+Medionidus_acutissimus	6
+Medionidus_conradicus	6
+Medionidus_penicillatus	6
+Medionidus_walkeri	6
+Megalonaias_nervosa	1
+Obovaria_olivaria	6
+Obovaria_unicolor	6
+Ortmanniana_ligamentina	1
+Ortmanniana_pectorosa	1
+Paetulunio_fabalis	6
+Parvaspina_collina	1
+Plethobasus_cyphyus	7
+Pleurobema_cordatum	7
+Pleurobema_decisum	7
+Pleurobema_oviforme	7
+Pleurobema_plenum	7
+Pleurobema_pyriforme	7
+Pleurobema_rubrum	7
+Pleurobema_sintoxia	7
+Pleurobema_strodeanum	7
+Potamilus_alatus	5
+Potamilus_amphichaenus	5
+Potamilus_capax	5
+Potamilus_fragilis	5
+Potamilus_inflatus	5
+Potamilus_leptodon	5
+Potamilus_metnecktayi	5
+Potamilus_ohiensis	5
+Ptychobranchus_fasciolaris	4
+Ptychobranchus_greenii	4
+Ptychobranchus_jonesi	4
+Ptychobranchus_occidentalis	4
+Ptychobranchus_subtentus	4
+Quadrula_fragosa	3
+Quadrula_quadrula	3
+Reginaia_ebenus	7
+Sagittunio_nasutus	6
+Sagittunio_subrostratus	6
+Theliderma_cylindrica	3
+Theliderma_metanevra	3
+Theliderma_sparsa	3
+Toxolasma_lividum	6
+Toxolasma_parvum	6
+Toxolasma_texasiense	6
+Tritogonia_nobilis	3
+Tritogonia_verrucosa	3
+Truncilla_donaciformis	5
+Truncilla_truncata	5
+Villosa_vibex	6
+Cyrtonaias_tampicoensis	1
+Elliptoideus_sloatianus	1
+Glebula_rotundata	1
+Hemistena_lata	1
+Villosa_delumbis	2
+Villosa_villosa	2
+
+
+;
+
+END;
