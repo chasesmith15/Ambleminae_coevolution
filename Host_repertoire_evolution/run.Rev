@@ -1,0 +1,126 @@
+#!/usr/bin/rb
+# We will reconstruct the coevolutionary history between Ambleminae and host fishes
+
+# Assign the trees and host repertoire files
+phy_host_fn = "fish_hosts_RB.new"
+phy_parasite_fn = "Mussels_with_host.new"
+dat_parasite_fn = "interaction_matrix.nex"
+
+# Read in the character data
+dat_parasite <- readDiscreteCharacterData(dat_parasite_fn)
+
+# Read the mussel and fish trees
+phy_host <- readTrees(phy_host_fn)[1]
+phy_parasite <- readTrees(phy_parasite_fn)[1]
+
+# Retrieve dataset dimensions
+n_host_tips <- phy_host.ntips()
+n_host_branches <- 2 * n_host_tips - 2
+n_parasite_branches <- 2 * phy_parasite.ntips() - 2
+n_sites <- dat_parasite.nchar()
+n_sites
+
+# Add more information to the name of output files
+out_str = "out.Amb.time"
+out_fn = "output/" + out_str
+
+
+# Next, we'll build the transition rate matrix for the model
+# First, create a vector containing all transition rates. Changed for a two state model!
+switch_rates_pos ~ dnDirichlet( [1,1] )
+switch_rate_0_to_1 := 1e-6    
+switch_rate_0_to_2 := switch_rates_pos[1]
+switch_rate_1_to_0 := 1e-6
+switch_rate_1_to_2 := 1e-6
+switch_rate_2_to_0 := switch_rates_pos[2]
+switch_rate_2_to_1 := 1e-6
+switch_rates := v( switch_rate_0_to_1, switch_rate_0_to_2, switch_rate_1_to_0, switch_rate_1_to_2, switch_rate_2_to_0, switch_rate_2_to_1 )
+
+# Build rate matrix under iid model
+Q_char := fnFreeK( transition_rates=switch_rates, rescaled=false )
+
+# Create the phylogenetic distance rate modifier (effect of host phylogeny on gain rate)
+# There are two values, the first for the gain 0->1 and the second for 1->2
+beta[1] ~ dnExp(1)
+beta[1].setValue(0.3)  # if you want to start the MCMC with reasonable values
+# In this example we assume they are equal
+beta[2] := beta[1]
+
+rate_modifiers[1] := fnHostSwitchRateModifier(tree=phy_host, gainScale=beta)
+
+# Build the Q rate matrix given the instantaneous rate of host gain and loss along branches
+Q_host := fnRateGeneratorSequence(Q=Q_char,
+                                   numChars=n_host_tips,
+                                   rateModifiers=rate_modifiers)
+
+# Overall rate (or "clock") of host repertoire evolution
+mu ~ dnExp(10)
+mu.setValue(0.01)  # if you want to start the MCMC with reasonable values
+
+# Uniform root state priors over the states (0,1,2). Updated for Two state model!
+rf_host <- simplex(1,0,1)
+
+# Phylogenetic CTMC using data augmented histories under non-iid model
+m_host ~ dnPhyloCTMCDASequence(tree=phy_parasite,
+                               Q=Q_host,
+                               branchRates=mu,
+                               rootFrequencies=rf_host,
+                               nSites=n_host_tips,
+                               type="Standard")
+m_host
+
+# We clamp the observed parasite-host relationships to the model
+m_host.clamp(dat_parasite)
+
+# Analysis variables - number of generations and sampling frequency for the MCMC
+n_gen = 4e5
+sample_freq = 50
+
+# Add MCMC proposals (moves) that will update parameter values during the MCMC
+moves = VectorMoves()
+
+moves.append( mvSimplex(switch_rates_pos, alpha=10, weight=2, tune=false) )
+moves.append( mvScale( beta[1], weight=1 ) )
+moves.append( mvScale(mu, weight=2) )
+moves.append( mvCharacterHistory(ctmc=m_host,
+                                 qmap_seq=Q_host,
+                                 lambda=0.2,
+                                 graph="node",
+                                 proposal="rejection",
+                                 weight=n_parasite_branches) )
+moves.append( mvCharacterHistory(ctmc=m_host,
+                                 qmap_seq=Q_host,
+                                 lambda=0.2,
+                                 graph="branch",
+                                 proposal="rejection",
+                                 weight=n_parasite_branches*2) )
+
+
+# Add monitors to save MCMC states
+monitors = VectorMonitors()
+
+monitors.append( mnScreen(mu, beta, printgen=sample_freq) )
+monitors.append( mnModel(printgen=sample_freq, filename=out_fn + ".log") )
+monitors.append( mnFile( phy_parasite, filename=out_fn + ".tre", printgen=sample_freq) )
+monitors.append( mnCharacterHistorySummary( filename=out_fn + ".history.txt",
+                                            ctmc=m_host,
+                                            tree=phy_parasite,
+                                            printgen=sample_freq ) )
+# optional format to record ancestral states
+#monitors.append( mnCharHistoryNewick( filename=out_fn + ".ch.tre",
+#                                 ctmc=m_host,
+#                                 tree=phy_parasite,
+#                                 printgen=sample_freq ) )
+
+# create model object from model variable
+model = model(m_host)
+
+# create MCMC from model, moves, and monitors
+ch = mcmc(model, monitors, moves)
+ch.run(n_gen)
+
+# run completed
+ch.operatorSummary()
+
+# quit!
+#quit()
